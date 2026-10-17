@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+asyncpg
+sqlalchemy>=2.0
+pgvector
+python-dotenv
+httpx
+pydantic
+pytest
+openai

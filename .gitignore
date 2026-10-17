@@ -1,0 +1,56 @@
+# Node
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+backend/fastapi
+backend/jwt
+backend/pydantic
+backend/pydantic_settings
+backend/starlette
+backend/uvicorn
+
+
+# Supabase
+.supabase/local/
+
+# Environment files
+.env
+.env*
+!.env.example
+*.local
+
+# Security & Secrets
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+
+# Vercel
+.vercel
+
+# IDE & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
