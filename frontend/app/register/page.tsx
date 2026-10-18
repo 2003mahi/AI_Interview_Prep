@@ -20,6 +20,9 @@ export default function RegisterPage() {
     setError(null);
 
     const supabase = createClient();
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const emailRedirectTo = `${origin}/auth/callback?next=${encodeURIComponent("/login?verified=true")}`;
+
     const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -27,7 +30,7 @@ export default function RegisterPage() {
         data: {
           full_name: fullName,
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo,
       },
     });
 
@@ -44,8 +47,15 @@ export default function RegisterPage() {
       return;
     }
 
+    // Clear form inputs
+    setFullName("");
+    setEmail("");
+    setPassword("");
     setSuccess(true);
     setLoading(false);
+
+    // Redirect to login page with confirmation message
+    router.push("/login?message=check-email");
   };
 
   const [resendLoading, setResendLoading] = useState(false);
@@ -56,11 +66,13 @@ export default function RegisterPage() {
     setResendLoading(true);
     setResendMessage(null);
     const supabase = createClient();
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const emailRedirectTo = `${origin}/auth/callback?next=${encodeURIComponent("/login?verified=true")}`;
     const { error: resendErr } = await supabase.auth.resend({
       type: "signup",
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo,
       },
     });
     setResendLoading(false);
