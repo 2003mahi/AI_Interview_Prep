@@ -15,6 +15,21 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith(route)
   );
 
+  const errorParam = request.nextUrl.searchParams.get("error");
+  const errorCode = request.nextUrl.searchParams.get("error_code");
+  const errorDescription = request.nextUrl.searchParams.get("error_description");
+  const typeParam = request.nextUrl.searchParams.get("type");
+
+  // If Supabase redirects auth errors or recovery to root '/', forward to /reset-password or /login
+  if (pathname === "/" && (errorParam || errorCode || typeParam === "recovery")) {
+    const isRecovery = typeParam === "recovery" || errorCode === "otp_expired" || (errorDescription && errorDescription.toLowerCase().includes("recovery"));
+    const targetUrl = new URL(isRecovery ? "/reset-password" : "/login", request.url);
+    if (errorDescription || errorParam) {
+      targetUrl.searchParams.set("error", errorDescription || errorParam || "Authentication error");
+    }
+    return NextResponse.redirect(targetUrl);
+  }
+
   // If Supabase environment variables are missing on Vercel, don't crash with 500
   if (!supabaseUrl || !supabaseKey) {
     if (isProtected) {
