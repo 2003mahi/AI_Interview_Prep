@@ -20,7 +20,7 @@ export default function RegisterPage() {
     setError(null);
 
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({
+    const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -37,8 +37,38 @@ export default function RegisterPage() {
       return;
     }
 
+    // In Supabase, if user already exists with email confirmations enabled, identities is empty []
+    if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
+      setError("An account with this email already exists. Please Sign In or use Forgot Password to reset your credentials.");
+      setLoading(false);
+      return;
+    }
+
     setSuccess(true);
     setLoading(false);
+  };
+
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
+
+  const handleResend = async () => {
+    if (!email) return;
+    setResendLoading(true);
+    setResendMessage(null);
+    const supabase = createClient();
+    const { error: resendErr } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    setResendLoading(false);
+    if (resendErr) {
+      setResendMessage(resendErr.message);
+    } else {
+      setResendMessage("Verification email resent! Please check your inbox and Spam/Junk folder.");
+    }
   };
 
   return (
@@ -51,8 +81,24 @@ export default function RegisterPage() {
           </div>
         )}
         {success && (
-          <div className="mb-4 rounded bg-green-50 p-3 text-sm text-green-700 border border-green-200">
-            Check your email for a verification link! Click it to activate your account.
+          <div className="mb-4 rounded bg-green-50 p-3 text-sm text-green-700 border border-green-200 space-y-2">
+            <p>
+              Check your email for a verification link! Click it to activate your account.
+            </p>
+            <p className="text-xs text-green-800">
+              Note: Emails from Supabase can take 1-2 minutes or land in your <strong>Spam / Junk / Promotions</strong> folder. Please check there as well!
+            </p>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendLoading}
+              className="mt-2 text-xs font-semibold text-green-900 underline hover:text-green-700 disabled:opacity-50"
+            >
+              {resendLoading ? "Resending..." : "Didn't receive email? Click here to resend"}
+            </button>
+            {resendMessage && (
+              <p className="mt-1 text-xs font-medium text-blue-700">{resendMessage}</p>
+            )}
           </div>
         )}
         <form onSubmit={handleRegister} className="space-y-4">
