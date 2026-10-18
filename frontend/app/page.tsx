@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { AuthRedirectListener } from "@/components/auth-redirect-listener";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+      <AuthRedirectListener />
       {/* Navigation */}
       <header className="border-b border-slate-800/80 backdrop-blur-md sticky top-0 z-50 bg-slate-950/70">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
